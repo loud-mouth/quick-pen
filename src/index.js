@@ -1,5 +1,6 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+require('electron-reload')(__dirname);
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -9,17 +10,30 @@ if (require('electron-squirrel-startup')) {
 
 const createWindow = () => {
   // Create the browser window.
+  console.log('hello window');
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    nodeIntegration: true, contextIsolation: false, enableRemoteModule: true,
+    width: 500,
+    height: 500,
+    // maxHeight: 100, minHeight: 100,
+    // maxWidth: 200, minWidth: 200,
+    frame: false,
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: __dirname + "\\preload.js",
+    },
+    transparent: true,
+    alwaysOnTop: true,
   });
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
-
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
+
+
+ipcMain.on('close-app', () => {app.quit()});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
